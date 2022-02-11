@@ -1,0 +1,1 @@
+CL /Os /Iinclude main.cpp /link lib\glfw3dll.lib opengl32.lib lib\opencl.lib /out:conetrace.exe
