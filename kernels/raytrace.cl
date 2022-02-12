@@ -26,8 +26,10 @@ bool rayIntersects(__global VoxelNode * node, float3 r0, float3 rd, float3 * p, 
 
     gVMul = 0.f;
 
-    bounds[0] = node->pos_size.xyz - (float3)((node->pos_size.w + gVoxSize * gVMul) * 0.5f);
-    bounds[1] = node->pos_size.xyz + (float3)((node->pos_size.w + gVoxSize * gVMul) * 0.5f);
+    float3 sz = (float3)((node->pos_size.w + gVoxSize * gVMul) * 0.5f);
+
+    bounds[0] = node->pos_size.xyz - sz;
+    bounds[1] = node->pos_size.xyz + sz;
 
     float3 rd2 = clamp((float3)(fabs(rd.x), fabs(rd.y), fabs(rd.z)), 1e-9f, 1e9f);
     if (rd.x < 0.f) {
@@ -128,111 +130,100 @@ __global VoxelNode * rayCast(int rootIndex, float3 r0, float3 rd, float maxVoxel
                 return NULL;
             }
             if (node->index_level.y <= 0 || ((node->pos_size.w/distance(*p, gCamPos)) <= maxVoxelSize)) {
-                if (node->index_level.y <= 0) {
-                    /*float3 p2 = r0 + rd * distance(node->pos_size.xyz, r0);
-                    float3 delta = distance(p2, node->pos_size.xyz);
-                    if (fabs(delta.x) < gVoxSize && fabs(delta.y) < gVoxSize && fabs(delta.z) < gVoxSize) {*/
-                        return node;
-                    //}
-                }
-                else if (rayIntersects(VOX + rootIndex, r0, rd, p, dist, 0.0)) {
-                    return node;
-                }
+                return node;
             }
-            const int aaa=node->aaa, baa=node->baa, aba=node->aba, bba=node->bba,
-                      aab=node->aab, bab=node->bab, abb=node->abb, bbb=node->bbb;
 
             int n = 0;
 
             if (rd.z < 0.f) {
                 if (rd.y < 0.f) {
                     if (rd.x < 0.f) {
-                        _RC(bbb)
-                        _RC(abb)
-                        _RC(bab)
-                        _RC(aab)
-                        _RC(bba)
-                        _RC(aba)
-                        _RC(baa)
-                        _RC(aaa)
+                        _RC(node->bbb)
+                        _RC(node->abb)
+                        _RC(node->bab)
+                        _RC(node->aab)
+                        _RC(node->bba)
+                        _RC(node->aba)
+                        _RC(node->baa)
+                        _RC(node->aaa)
                     }
                     else {
-                        _RC(abb)
-                        _RC(bbb)
-                        _RC(aab)
-                        _RC(bab)
-                        _RC(aba)
-                        _RC(bba)
-                        _RC(aaa)
-                        _RC(baa)
+                        _RC(node->abb)
+                        _RC(node->bbb)
+                        _RC(node->aab)
+                        _RC(node->bab)
+                        _RC(node->aba)
+                        _RC(node->bba)
+                        _RC(node->aaa)
+                        _RC(node->baa)
                     }
                 }
                 else {
                     if (rd.x < 0.f) {
-                        _RC(bab)
-                        _RC(aab)
-                        _RC(bbb)
-                        _RC(abb)
-                        _RC(baa)
-                        _RC(aaa)
-                        _RC(bba)
-                        _RC(aba)
+                        _RC(node->bab)
+                        _RC(node->aab)
+                        _RC(node->bbb)
+                        _RC(node->abb)
+                        _RC(node->baa)
+                        _RC(node->aaa)
+                        _RC(node->bba)
+                        _RC(node->aba)
                     }
                     else {
-                        _RC(aab)
-                        _RC(bab)
-                        _RC(abb)
-                        _RC(bbb)
-                        _RC(aaa)
-                        _RC(baa)
-                        _RC(aba)
-                        _RC(bba)
+                        _RC(node->aab)
+                        _RC(node->bab)
+                        _RC(node->abb)
+                        _RC(node->bbb)
+                        _RC(node->aaa)
+                        _RC(node->baa)
+                        _RC(node->aba)
+                        _RC(node->bba)
                     }
                 }
             }
             else {
                 if (rd.y < 0.f) {
                     if (rd.x < 0.f) {
-                        _RC(bba)
-                        _RC(aba)
-                        _RC(baa)
-                        _RC(aaa)
-                        _RC(bbb)
-                        _RC(abb)
-                        _RC(bab)
-                        _RC(aab)
+                        _RC(node->bba)
+                        _RC(node->aba)
+                        _RC(node->baa)
+                        _RC(node->aaa)
+                        _RC(node->bbb)
+                        _RC(node->abb)
+                        _RC(node->bab)
+                        _RC(node->aab)
                     }
                     else {
-                        _RC(aba)
-                        _RC(bba)
-                        _RC(aaa)
-                        _RC(baa)
-                        _RC(abb)
-                        _RC(bbb)
-                        _RC(aab)
-                        _RC(bab)
+                        _RC(node->aba)
+                        _RC(node->bba)
+                        _RC(node->aaa)
+                        _RC(node->baa)
+                        _RC(node->abb)
+                        _RC(node->bbb)
+                        _RC(node->aab)
+                        _RC(node->bab)
                     }
                 }
                 else {
                     if (rd.x < 0.f) {
-                        _RC(baa)
-                        _RC(aaa)
-                        _RC(bba)
-                        _RC(aba)
-                        _RC(bab)
-                        _RC(aab)
-                        _RC(bbb)
-                        _RC(abb)
+                        _RC(node->baa)
+                        _RC(node->aaa)
+                        _RC(node->bba)
+                        _RC(node->aba)
+                        _RC(node->bab)
+                        _RC(node->aab)
+                        _RC(node->bbb)
+                        _RC(node->abb)
                     }
                     else {
-                        _RC(aaa)
-                        _RC(baa)
-                        _RC(aba)
-                        _RC(bba)
-                        _RC(aab)
-                        _RC(bab)
-                        _RC(abb)
-                        _RC(bbb)
+                        _RC(node->aaa)
+                        _RC(node->baa)
+                        _RC(node->aba)
+                        _RC(node->bba)
+                        _RC(node->aab)
+                        _RC(node->bab)
+                        _RC(node->abb)
+                        _RC(node->bbb)
                     }
                 }
             }
@@ -279,10 +270,11 @@ float3 getColor(int rootIndex, float3 r0, float3 rd, float maxVoxelSize, float m
     float dist;
 
     float3 ret = (float3)(0., 0., 0.);
+    float lastReflect = 1.f;
 
     for (int ri=0; ri<=NUM_REFLECT; ri++) {
 
-        __global VoxelNode * N1 = rayCast(rootIndex, r0, rd, maxVoxelSize, &p, &dist, maxDist);
+        __global VoxelNode * N1 = rayCast(rootIndex, r0, rd, maxVoxelSize * (ri > 0 ? 2.f : 1.f), &p, &dist, maxDist);
 
         if (N1 == NULL) {
             break;
@@ -293,7 +285,7 @@ float3 getColor(int rootIndex, float3 r0, float3 rd, float maxVoxelSize, float m
         float4 ce1 = parseColorReflect(N1);
         float4 nr1 = parseNormalEmit(N1);
 
-        ret += ce1.xyz * nr1.w * (1.f - ce1.w);
+        ret += ce1.xyz * nr1.w * (1.f - ce1.w) * lastReflect;
 
         for (int i=0; i<gLightCount && i<MAX_LIGHTS; i++) {
             __global LightSource * L = LIGHT + i;
@@ -301,9 +293,9 @@ float3 getColor(int rootIndex, float3 r0, float3 rd, float maxVoxelSize, float m
             if (distF < L->pos_range.w) {
                 float3 lightDir = (L->pos_range.xyz - p) / distF;
                 float3 _t1; float _t2;
-                float shadowF = rayCast(rootIndex, p + nr1.xyz * F1, lightDir, maxVoxelSize, &_t1, &_t2, L->pos_range.w) == NULL ? 1.f : 0.25f;
+                float shadowF = rayCast(rootIndex, p + nr1.xyz * F1, lightDir, maxVoxelSize*2.f, &_t1, &_t2, L->pos_range.w) == NULL ? 1.f : 0.25f;
                 distF = 1.f - distF / L->pos_range.w;
-                ret += ce1.xyz * distF * L->color.xyz * clamp(dot(lightDir, nr1.xyz), 0.f, 1.f) * shadowF * (1.f - ce1.w);
+                ret += ce1.xyz * distF * L->color.xyz * clamp(dot(lightDir, nr1.xyz), 0.f, 1.f) * shadowF * (1.f - ce1.w) * lastReflect;
             }
         }
 
@@ -313,6 +305,8 @@ float3 getColor(int rootIndex, float3 r0, float3 rd, float maxVoxelSize, float m
 
         r0 = p + nr1.xyz * F1;
         rd = normalize(reflect(rd, nr1.xyz));
+
+        lastReflect = ce1.w;
     }
 
     return ret;
@@ -349,7 +343,7 @@ __kernel void raytrace_main( __global VoxelNode *voxels,
 
         gCamPos = cameraPosition;
         gVoxSize = voxelSize;
-        float maxVoxelSize = 0.1f * voxelSize / max(screenSize.x, screenSize.y);
+        float maxVoxelSize = 0.2f * voxelSize / max(screenSize.x, screenSize.y);
 
         float3 left = cross(cameraDirection, cameraUp);
         float3 up = cross(left, cameraDirection);

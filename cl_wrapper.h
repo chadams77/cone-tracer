@@ -440,10 +440,6 @@ public:
         }
     }
 
-    size_t prefWorkSizeMul(cl::Kernel & kernel) {
-	    return kernel.getWorkGroupInfo<CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE>(context->devices[context->preferredDevice]);
-    }
-
     cl::Kernel * getFunction(string function) {
         if (functions.find(function) != functions.end()) {
             return functions[function];
@@ -457,7 +453,8 @@ public:
     bool callFunction(string function, size_t n) {
         cl::Kernel * kernel = getFunction(function);
         size_t mwSize = kernel->getWorkGroupInfo<CL_KERNEL_WORK_GROUP_SIZE>(context->devices[context->preferredDevice]);
-        size_t localSize = mwSize;
+        size_t mul = kernel->getWorkGroupInfo<CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE>(context->devices[context->preferredDevice]);
+        size_t localSize = ((size_t)floor((float)mwSize / (float)mul)) * mul;
         size_t globalSize = ((n+localSize-1) / localSize) * localSize;
         cl::Event event;
         int err = queue.enqueueNDRangeKernel(*kernel, cl::NullRange, cl::NDRange(globalSize), cl::NDRange(localSize), NULL, &event);
